@@ -1,4 +1,27 @@
 #!/usr/bin/env python
+"""
+$W$: size of the vocabulary
+
+$m$: dims of low-dim embedding
+
+$ U, V \in \mathcal{R}^{m \times W}$, outside and center word vectors $ (u_k, v_k) \in  \mathcal{R}^{ m \times 1}$, one hot vector $y \in \mathcal{R}^{W \times 1}$, softmax prediction $\hat{y} \in \mathcal{R}^{W \times 1}$
+     
+
+Loss function is: 
+$$J = - \sum_{i=1}^W y_i log(\frac{exp(u_i^Tv_c)}{\sum_{w=1}^Wexp(u_w^Tv_c)})$$ 
+Simplifying, 
+$$ J = - \sum_{i=1}^Wy_i[u_i^Tv_c - log(\sum_{w=1}^Wexp(u_w^Tv_c))]; \qquad y_o = 1 $$
+$y_k = 1$ if $k=o$ else $y_k = 0 \; \forall k \neq o$ (one hot encoding)
+$$\implies J(v_c, o, U) = - u_o^Tv_c + log(\sum_{w=1}^Wexp(u_w^Tv_c))$$
+
+Derivatives of loss function w.r.t the parameters of the model:
+
+$$\frac{\partial J}{\partial v_c}  = U[\hat{y} -y]$$
+
+$$\frac{\partial J}{\partial U}  = v_c [\hat{y} - y]^T$$
+
+"""
+
 
 import numpy as np
 import random
@@ -57,7 +80,28 @@ def naiveSoftmaxLossAndGradient(
     ### Please use the provided softmax function (imported earlier in this file)
     ### This numerically stable implementation helps you avoid issues pertaining
     ### to integer overflow. 
-
+    '''
+     W: size of the vocabulary
+     m: dims of low-dim embedding
+     U: W x m
+     u_k, v_k: column vectors m x 1
+     y: one hot vector W x 1
+     y_hat: softmax prediction W x 1
+    
+     d_J / dv_c = U transose([y_hat - y])     shape: m x 1
+     
+    
+    '''
+    # u_o = outsideVectors[outsideWordIdx]
+    arg = outsideVectors @ centerWordVec # W x 1 = (W x m) @ (m x 1)
+    y_hat = softmax(arg) # (W x 1) 
+    loss = -1 * np.log(y_hat[outsideWordIdx]) # (W x 1)
+    
+    y_hat_copy = y_hat.copy()
+    # (y_hat - y) speed up by updating only for contex words 
+    y_diff[outsideWordIdx] = y_hat_copy[outsideWordIdx] - 1 
+    gradCenterVec = outsideVectors.T @ y_diff # dJ_dv_c (m x 1) = (m x W) @ (W x 1) 
+    gradOutsideVecs = np.outer(y_hat, centerWordVec) # y @ v^T # (W x m) = (W x m) x (m x 1) 
 
     ### END YOUR CODE
 
@@ -143,7 +187,7 @@ def skipgram(currentCenterWord, windowSize, outsideWords, word2Ind,
                         (dJ / dU in the pdf handout)
     """
 
-    loss = 0.0
+    loss = 0
     gradCenterVecs = np.zeros(centerWordVectors.shape)
     gradOutsideVectors = np.zeros(outsideVectors.shape)
 
@@ -260,3 +304,6 @@ Gradient wrt Center Vectors (dJ/dV):
 
 if __name__ == "__main__":
     test_word2vec()
+
+""
+
