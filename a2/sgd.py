@@ -9,6 +9,7 @@ import random
 import numpy as np
 import os.path as op
 
+
 def load_saved_params():
     """
     A helper function that loads previously saved parameters and resets
@@ -38,7 +39,12 @@ def save_params(iter, params):
         pickle.dump(random.getstate(), f)
 
 
-def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
+def sgd(f,
+        x0,
+        step,
+        iterations,
+        postprocessing=None,
+        useSaved=False,
         PRINT_EVERY=10):
     """ Stochastic Gradient Descent
 
@@ -67,7 +73,7 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
         start_iter, oldx, state = load_saved_params()
         if start_iter > 0:
             x0 = oldx
-            step *= 0.5 ** (start_iter / ANNEAL_EVERY)
+            step *= 0.5**(start_iter / ANNEAL_EVERY)
 
         if state:
             random.setstate(state)
@@ -85,9 +91,10 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
         # You might want to print the progress every few iterations.
 
         loss = None
-        ### YOUR CODE HERE
-
-        ### END YOUR CODE
+        # ## YOUR CODE HERE
+        loss, grad = f(x)
+        x = x - step * grad
+        # ## END YOUR CODE
 
         x = postprocessing(x)
         if iter % PRINT_EVERY == 0:
@@ -107,7 +114,7 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
 
 
 def sanity_check():
-    quad = lambda x: (np.sum(x ** 2), x * 2)
+    quad = lambda x: (np.sum(x**2), x * 2)
 
     print("Running sanity checks...")
     t1 = sgd(quad, 0.5, 0.01, 1000, PRINT_EVERY=100)
