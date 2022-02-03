@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+# "jupytext_formats: ipynb,py"
+# !/usr/bin/env python
 """
 ## Word vectors
 A mapping from a high dimensional discret vocabulary space $\mathbb{Y}$ to a lower dimensional continuous vector space. Each element $y_i$ of $\mathbb{Y}$ can be represented as a one hot vector of a every word in the vocabulary.
