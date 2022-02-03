@@ -27,6 +27,8 @@
 *.so
 **/*.ipynb_checkpoints/
 **/*/*.ipynb_checkpoints/
+*.pickle
+
 
 /data/*
 */data/*
