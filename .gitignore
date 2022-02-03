@@ -25,6 +25,7 @@
 *.out.dSYM/*
 *.plist
 *.so
+**/*.ipynb_checkpoints/
 
 /data/*
 */data/*
